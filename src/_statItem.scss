@@ -1,0 +1,44 @@
+.stat-item-container {
+	padding-bottom: 1rem;
+	width: 100%;
+	height: 236px;
+	padding: 1rem;
+	position: relative;
+
+	border-radius: 38px;
+	background: #ffffff;
+	box-shadow:  24px 24px 47px #cccccc, 
+				-24px -24px 47px #ffffff;
+	.c--stat-label {
+		position: absolute;
+		bottom: 1rem;
+		left: 1rem;
+	}
+	.c--stat-number {
+		@include carbon--type-style('display-03');
+		font-size: 4.625rem;
+		font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono',
+	  'Bitstream Vera Sans Mono', Courier, monospace;
+	}
+	.c--fluctuation {
+		align-items: center;
+		bottom: 1rem;
+		display: flex;
+		position: absolute;
+		right: 1rem;
+	}
+}
+
+@media (min-width: 522px) {
+	.stat-item-container {
+		width: 236px;
+	}
+}
+
+@media (max-width: 522px) {
+	.stat-item-container {
+		&:last-of-type {
+			margin-bottom: 4rem;
+		}
+	}
+}

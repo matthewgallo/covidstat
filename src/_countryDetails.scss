@@ -1,0 +1,41 @@
+.c--last-updated {
+	@include carbon--type-style('label-01');
+	padding-bottom: 2rem;
+}
+
+.stat-items-container {
+	display: grid;
+    grid-template-columns: auto;
+    grid-gap: 1rem;
+}
+
+.floating-button-link {
+	height: 64px;
+    width: 64px;
+    display: flex;
+    align-items: center;
+	justify-content: center;
+	position: fixed;
+	bottom: 2rem;
+
+	border-radius: 150px;
+	background: $carbon--white-0;
+	box-shadow:  6px 6px 13px #d9d9d9, 
+				-6px -6px 13px $carbon--white-0;
+	transition: box-shadow .25s ease-in;
+	&:focus {
+		outline: 0;
+		border: 1px solid $carbon--blue-10;
+		box-shadow:  10px 10px 20px $carbon--blue-30, 
+					-10px -10px 20px $carbon--white-0;
+	}
+	&.download-button-link {
+		right: 1rem;
+	}
+}
+
+@media (min-width: 522px) {
+	.stat-items-container {
+		grid-template-columns: repeat(2, 0fr);
+	}
+}
