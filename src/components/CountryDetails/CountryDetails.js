@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateState } from './redux/commonActions';
-import { RestApi } from './utils/RestApi';
-import PageWrapper from './PageWrapper';
-import StatItem from './StatItem';
+import { updateState } from '../../redux/commonActions';
+import { RestApi } from '../../utils/RestApi';
+import PageWrapper from '../PageWrapper/PageWrapper';
+import StatItem from '../StatItem/StatItem';
 import LeftArrow20 from '@carbon/icons-react/lib/arrow--left/20';
 import Download20 from '@carbon/icons-react/lib/download/20';
 import { SkeletonPlaceholder } from 'carbon-components-react';

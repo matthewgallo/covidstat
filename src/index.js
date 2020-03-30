@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import App from './App';
+import Homepage from './components/Homepage/Homepage';
 import { Provider } from 'react-redux';
 import store from './redux/Store';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import CountryDetails from './CountryDetails';
+import CountryDetails from './components/CountryDetails/CountryDetails';
 import GA from './utils/GoogleAnalytics'
 
 ReactDOM.render(
@@ -21,7 +21,7 @@ ReactDOM.render(
         </Link>
         <Route exact
             path="/"
-            component={App}
+            component={Homepage}
         />
         <Route exact
             path="/country/:countryFriendlyName"

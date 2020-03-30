@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { RestApi } from './utils/RestApi';
+import { RestApi } from '../../utils/RestApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateState } from './redux/commonActions';
+import { updateState } from '../../redux/commonActions';
 import { TextInput } from 'carbon-components-react';
 import { Link } from 'react-router-dom';
-import PageWrapper from './PageWrapper';
+import PageWrapper from '../PageWrapper/PageWrapper';
 
 
 const SCOPE = 'app';
