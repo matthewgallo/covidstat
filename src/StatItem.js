@@ -32,6 +32,7 @@ const StatItem = ({ statNumber, label, backButton, fluctuation }) => {
 					? <DownArrow16 />
 					: ''
 				}
+				{'*'}
 			</p>
 			<p className="c--stat-label">{label}</p>
 		</div>

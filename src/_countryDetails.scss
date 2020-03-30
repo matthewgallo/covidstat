@@ -1,5 +1,9 @@
 .c--last-updated {
 	@include carbon--type-style('label-01');
+}
+
+.c--fluctuation-label {
+	@include carbon--type-style('label-01');
 	padding-bottom: 2rem;
 }
 

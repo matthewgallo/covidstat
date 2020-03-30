@@ -73,6 +73,7 @@ const CountryDetails = props => {
 		<PageWrapper>
 			<h1>{currentCountry ? currentCountry[0] : <SkeletonPlaceholder />}</h1>
 			<p className="c--last-updated">Last updated {latestDate ? latestDate : <SkeletonPlaceholder />}</p>
+			<p className="c--fluctuation-label">* Represents data fluctuation from previous day</p>
 			<div className="stat-items-container">
 				<StatItem
 					statNumber={confirmedCases}
