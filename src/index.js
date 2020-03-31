@@ -7,6 +7,7 @@ import store from './redux/Store';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import CountryDetails from './components/CountryDetails/CountryDetails';
+import ComparePage from './components/ComparePage/ComparePage';
 import GA from './utils/GoogleAnalytics'
 
 ReactDOM.render(
@@ -26,6 +27,10 @@ ReactDOM.render(
         <Route exact
             path="/country/:countryFriendlyName"
             component={CountryDetails}
+        />
+        <Route exact
+            path="/compare/:countriesToCompare"
+            component={ComparePage}
         />
         </>
         </Switch>

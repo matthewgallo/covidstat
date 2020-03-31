@@ -24,9 +24,13 @@
     bottom: 3rem;
     position: relative;
     .c--search-results-container {
+      margin-top: -5rem;
       position: absolute;
     }
-    #c--main-search-input {
+    #c--main-search-input,
+    #c--main-multi-select,
+    .bx--multi-select__wrapper.bx--list-box__wrapper,
+    .bx--content-switcher {
       max-width: 420px;
     }
     .c--search-result-item {
@@ -35,6 +39,22 @@
       font-size: 1.5rem;
       font-weight: 300;
     }
+  }
+  .c--compare-button {
+    padding-top: 1rem;
+    svg {
+      fill: $carbon--white-0;
+      position: absolute;
+      right: 1rem;
+    }
+  }
+  .c--compare-submit-button {
+    max-width: 420px;
+    width: 100%;;
+  }
+  .c--submit-button-container {
+    min-height: 3rem;
+    margin-top: 2rem;
   }
 }
 
