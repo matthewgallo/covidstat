@@ -13,26 +13,30 @@ const CountryDetails = props => {
 	const dispatch = useDispatch();
 	const currentCountry = useSelector(state => state['app'] && state['app'].currentSelectedCountry)
 
-	const fetchData = async (countryURLName) => {
-		const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-		covidData['United States'] = covidData['US'];
-		delete covidData['US'];
-		const searchValue = countryURLName.toLocaleLowerCase();
-		const updatedData = Object.entries(covidData);
-		let searchResult = updatedData.filter(country => country[0].toLocaleLowerCase() === searchValue);
-		dispatch(updateState('app', {
-			currentSelectedCountry: [...searchResult[0]]
-		}))
-	  }
-
+	
 	useEffect(() => {
+		const fetchData = async (countryURLName) => {
+			const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
+			covidData['United States'] = covidData['US'];
+			delete covidData['US'];
+			const searchValue = countryURLName.toLocaleLowerCase();
+			const updatedData = Object.entries(covidData);
+			let searchResult = updatedData.filter(country => country[0].toLocaleLowerCase() === searchValue);
+			if (searchResult.length) {
+				dispatch(updateState('app', {
+					currentSelectedCountry: [...searchResult[0]]
+				}))
+			} else {
+				props.history.push('/');
+			}
+		  }
 		// code to run on component mount
 		if (!currentCountry) {
 			// console.log('we do not have the data for the selected country.');
 			const countryURLName = props.match.params.countryFriendlyName.replace(/-/g, ' ');
 			fetchData(countryURLName)
 		}
-	  }, []);
+	  }, [currentCountry, dispatch, props.match.params.countryFriendlyName, props.history]);
 	// console.log("Current country: ", currentCountry);
 	const latestData = currentCountry && currentCountry[1][currentCountry[1].length - 1];
 	const yesterdaysData = currentCountry && currentCountry[1][currentCountry[1].length - 2];
@@ -43,8 +47,6 @@ const CountryDetails = props => {
 	const yesterdaysConfirmedCases = yesterdaysData?.confirmed;
 	const yesterdaysDeaths = yesterdaysData?.deaths;
 	const yesterdaysRecovered = yesterdaysData?.recovered;
-	console.log(recovered);
-	console.log(yesterdaysRecovered);
 
 	const confirmedCaseFluctuation = confirmedCases && yesterdaysConfirmedCases && Math.round(((Number(confirmedCases) / Number(yesterdaysConfirmedCases))*100) - 100);
 	const deathFluctuation = deaths && yesterdaysDeaths && Math.round(((Number(deaths) / Number(yesterdaysDeaths))*100) - 100);

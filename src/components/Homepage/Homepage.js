@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { RestApi } from '../../utils/RestApi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,24 +11,25 @@ import PageWrapper from '../PageWrapper/PageWrapper';
 const SCOPE = 'app';
 function App(props) {
   const dispatch = useDispatch();
-  const [previousCountries, setPreviousCountries] = useState([]);
+  // const [previousCountries, setPreviousCountries] = useState([]);
   const covidData = useSelector(state => state[SCOPE] && state[SCOPE].covidData);
   const searchResults = useSelector(state => state[SCOPE] && state[SCOPE].searchResults);
   
-  const fetchData = async () => {
-    const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-    covidData['United States'] = covidData['US'];
-    delete covidData['US'];
-    dispatch(updateState(SCOPE, {
-      covidData,
-      currentSelectedCountry: []
-    }))
-  }
-
+  
+  
   useEffect(() => {
+    const fetchData = async () => {
+      const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
+      covidData['United States'] = covidData['US'];
+      delete covidData['US'];
+      dispatch(updateState(SCOPE, {
+        covidData,
+        currentSelectedCountry: []
+      }))
+    }
     // code to run on component mount
     fetchData();
-  }, []);
+  }, [dispatch]);
     
     const handleSearch = (event) => {
       // console.log(covidData);
@@ -51,7 +52,7 @@ function App(props) {
         currentSelectedCountry: country,
         searchResults: []
       }))
-      setPreviousCountries(oldCountries => [...oldCountries, country]);
+      // setPreviousCountries(oldCountries => [...oldCountries, country]);
       props.history.push(`/country/${urlFriendlyCountryName}`)
     }
 
