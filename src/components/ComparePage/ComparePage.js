@@ -7,7 +7,6 @@ import Download20 from '@carbon/icons-react/lib/download/20';
 import { RestApi } from '../../utils/RestApi';
 import { updateState } from '../../redux/commonActions';
 import StatItem from '../StatItem/StatItem';
-import { SkeletonText } from 'carbon-components-react';
 
 const ComparePage = ({ history, match }) => {
 
@@ -35,7 +34,7 @@ const ComparePage = ({ history, match }) => {
 					countriesToCompare.push(item);
 				}
 			})
-			if (countriesToCompare.length) {
+			if (countriesToCompare.length.length < 4) {
 				dispatch(updateState('app', {
 					selectedCountriesToCompare: countriesToCompare
 				}))
@@ -80,11 +79,10 @@ const ComparePage = ({ history, match }) => {
 	}
 
 	const latestDate = selectedCountriesToCompare?.length && selectedCountriesToCompare[0].data[selectedCountriesToCompare[0].data.length - 1].date;
-	// let latestDate;
 	return (
 		<PageWrapper classProp="compare-page-wrapper">
 			<h1>Compare</h1>
-			<p className="c--last-updated">Last updated {latestDate ? latestDate : <SkeletonText />}</p>
+			<p className="c--last-updated">Last updated {latestDate ? latestDate : ''}</p>
 			<p className="c--fluctuation-label">&#176; Daily increase (count)</p>
 			<p className="c--fluctuation-label">* Daily increase (percent)</p>
 			<div className="stat-items-container">
