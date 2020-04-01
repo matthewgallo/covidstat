@@ -36,8 +36,13 @@
 @media (max-width: 770px) {
 	.compare-page-wrapper {
 		.stat-items-container {
-			grid-template-columns: 1fr 1fr 1fr;
 			grid-gap: .5rem;
+			&.stat-items-container-mobile-2 {
+				grid-template-columns: 1fr 1fr;
+			}
+			&.stat-items-container-mobile-3 {
+				grid-template-columns: 1fr 1fr 1fr;
+			}
 			.stat-item-container {
 				width: 100%;
 				.c--stat-number {

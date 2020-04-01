@@ -85,10 +85,7 @@ const ComparePage = ({ history, match }) => {
 			<p className="c--last-updated">Last updated {latestDate ? latestDate : ''}</p>
 			<p className="c--fluctuation-label">&#176; Daily increase (count)</p>
 			<p className="c--fluctuation-label">* Daily increase (percent)</p>
-			<div className="stat-items-container"
-				style={{
-					gridTemplateColumns: selectedCountriesToCompare?.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr',
-				}}
+			<div className={`stat-items-container ${selectedCountriesToCompare?.length === 2 ? 'stat-items-container-mobile-2' : 'stat-items-container-mobile-3'}`}
 			>
 				{selectedCountriesToCompare && selectedCountriesToCompare.length
 					? selectedCountriesToCompare.map((item, i) => {

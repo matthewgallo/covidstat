@@ -8,6 +8,7 @@ import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import CountryDetails from './components/CountryDetails/CountryDetails';
 import ComparePage from './components/ComparePage/ComparePage';
+import FourOhFour from './components/FourOhFour/FourOhFour.js';
 import GA from './utils/GoogleAnalytics'
 
 ReactDOM.render(
@@ -31,6 +32,9 @@ ReactDOM.render(
         <Route exact
             path="/compare/:countriesToCompare"
             component={ComparePage}
+        />
+        <Route path="*"
+          component={FourOhFour}
         />
         </>
         </Switch>
