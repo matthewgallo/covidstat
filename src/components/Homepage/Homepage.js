@@ -105,7 +105,9 @@ function App(props) {
     }
 
     const compareCountries = () => {
-      if ((selectedCountriesToCompare && selectedCountriesToCompare.length === 1)) {
+      if ((selectedCountriesToCompare && selectedCountriesToCompare.length === 1) ||
+      !selectedCountriesToCompare?.length
+      ) {
           dispatch(updateState(SCOPE, {
             multiSelectInvalid: setMultiSelectInvalid(true),
           }));
