@@ -4,7 +4,9 @@
 
 .c--fluctuation-label {
 	@include carbon--type-style('label-01');
-	padding-bottom: 2rem;
+	&:last-of-type {
+		padding-bottom: 2rem;
+	}
 }
 
 .stat-items-container {

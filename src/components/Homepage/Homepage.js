@@ -1,47 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { RestApi } from '../../utils/RestApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateState } from '../../redux/commonActions';
-import { Button, ContentSwitcher, MultiSelect, Switch, TextInput } from 'carbon-components-react';
+import { Button, MultiSelect, TextInput } from 'carbon-components-react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../PageWrapper/PageWrapper';
+import { Search16, Compare16 } from '@carbon/icons-react';
 
 
 const SCOPE = 'app';
 function App(props) {
   const dispatch = useDispatch();
-  const [previousCountries, setPreviousCountries] = useState([]);
   const [multiSelectInvalid, setMultiSelectInvalid] = useState(false);
   const [activeView, setActiveView] = useState('search');
+  // const [previousCountries, setPreviousCountries] = useState([]);
   const covidData = useSelector(state => state[SCOPE] && state[SCOPE].covidData);
   const covidDataProperFormat = useSelector(state => state[SCOPE] && state[SCOPE].covidDataProperFormat);
   const selectedCountriesToCompare = useSelector(state => state[SCOPE] && state[SCOPE].selectedCountriesToCompare);
   const searchResults = useSelector(state => state[SCOPE] && state[SCOPE].searchResults);
   
-  const fetchData = async () => {
-    const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-    covidData['United States'] = covidData['US'];
-    delete covidData['US'];
-    const mutatedData = Object.entries(covidData);
-    const covidDataProperFormat = mutatedData.map(dataItem => { 
-      return { 
-        country: dataItem[0], 
-        data: dataItem[1] 
-      }; 
-    });
-    dispatch(updateState(SCOPE, {
-      covidData,
-      covidDataProperFormat,
-      currentSelectedCountry: [],
-      selectedCountriesToCompare: []
-    }))
-  }
 
   useEffect(() => {
+    const fetchData = async () => {
+      const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
+      covidData['United States'] = covidData['US'];
+      delete covidData['US'];
+      const mutatedData = Object.entries(covidData);
+      const covidDataProperFormat = mutatedData.map(dataItem => { 
+        return { 
+          country: dataItem[0], 
+          data: dataItem[1] 
+        }; 
+      });
+      dispatch(updateState(SCOPE, {
+        covidData,
+        covidDataProperFormat,
+        currentSelectedCountry: [],
+        selectedCountriesToCompare: []
+      }))
+    }
     // code to run on component mount
     fetchData();
-  }, []);
+  }, [dispatch]);
     
     const handleSearch = (event) => {
       // console.log(covidData);
@@ -64,7 +65,8 @@ function App(props) {
         currentSelectedCountry: country,
         searchResults: []
       }))
-      setPreviousCountries(oldCountries => [...oldCountries, country]);
+      setActiveView('search');
+      // setPreviousCountries(oldCountries => [...oldCountries, country]);
       props.history.push(`/country/${urlFriendlyCountryName}`)
     }
 
@@ -77,16 +79,14 @@ function App(props) {
             )
     }
 
-    const toggleView = () => {
-      const currentView = activeView === 'search' ? 'compare' : 'search';
-      setActiveView(currentView)
+    const toggleView = view => {
+      setActiveView(view)
       dispatch(updateState(SCOPE, {
         selectedCountriesToCompare: [],
       }));
     }
 
     const multiSelectChange = event => {
-      console.log(event);
         dispatch(updateState(SCOPE, {
           selectedCountriesToCompare: event.selectedItems
         }));
@@ -109,6 +109,7 @@ function App(props) {
           dispatch(updateState(SCOPE, {
             multiSelectInvalid: setMultiSelectInvalid(true),
           }));
+          return;
       }
       if (multiSelectInvalid) {
         return;
@@ -121,30 +122,27 @@ function App(props) {
       combinedUrlCountries = combinedUrlCountries.replace(/[. :-]+/g, "-").toLocaleLowerCase();
       const formattedCompareUrl = combinedUrlCountries.replace(/,/g, '+');
       props.history.push(`/compare/${formattedCompareUrl}`)
+      setActiveView('search');
     }
 
   return (
     <PageWrapper>
+      <div className={`toggle-button-container ${activeView === 'search' ? 'search-container-active' : 'compare-container-active'}`}>
+        <Button className={`c--toggle-icon-button ${activeView === 'search' ? 'search-button-active' : 'search-button-inactive'}`}
+          onClick={() => toggleView('search')}
+        >
+          <Search16 />
+        </Button>
+        <Button className={`c--toggle-icon-button ${activeView === 'search' ? 'compare-button-inactive' : 'compare-button-active'}`}
+          onClick={() => toggleView('compare')}
+        >
+          <Compare16 />
+        </Button>
+        <div className="toggle-background-slider" />
+      </div>
       <div className="c--main-app-container">
         <div className="c--inner-container">
         <h3>Welcome,<br /><span>search or compare COVID-19 data by country</span></h3>
-          <ContentSwitcher
-              onChange={() => toggleView()}
-              selectedIndex={0}
-            >
-              <Switch
-                name="Search"
-                onClick={function noRefCheck(){}}
-                selected={activeView === 'search' ? true : false}
-                text="Search"
-              />
-              <Switch
-                name="Compare"
-                onClick={function noRefCheck(){}}
-                selected={activeView !== 'search' ? true : false}
-                text="Compare"
-              />
-          </ContentSwitcher>
           {activeView === 'search'
           ? <>
           <TextInput
@@ -152,6 +150,7 @@ function App(props) {
             onChange={event => handleSearch(event)}
             id="c--main-search-input"
             placeholder="Search by country"
+            labelText=""
           />
           </>
           : <>

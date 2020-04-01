@@ -19,13 +19,21 @@
 		font-size: 4.625rem;
 		font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono',
 	  'Bitstream Vera Sans Mono', Courier, monospace;
+	  &.c--large-stat-number {
+		  font-size: 2.625rem;
+	  }
 	}
-	.c--fluctuation {
+	.c--fluctuation,
+	.c--differential-label {
+		@include carbon--type-style('label-01');
 		align-items: center;
 		bottom: 1rem;
 		display: flex;
 		position: absolute;
 		right: 1rem;
+	}
+	.c--differential-label {
+		bottom: 2rem;
 	}
 }
 
