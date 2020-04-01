@@ -1,0 +1,95 @@
+.compare-page-wrapper {
+	&.c--page-wrapper {
+		padding: 2rem 0 4rem 0;
+	}
+	@media (min-width: 522px) {
+		.stat-items-container {
+			grid-template-columns: repeat(3, 0fr);
+		}
+	}
+}
+
+.c--compare-column {
+	.c--country-name-label {
+		margin-bottom: 2rem;
+	}
+	&.c--compare-column-0 {
+		.stat-item-container {
+			@include statCardAccent;
+		}
+	}
+	&.c--compare-column-1 {
+		.stat-item-container {
+			@include statCardAccent($carbon--green-40);
+		}
+	}
+	&.c--compare-column-2 {
+		.stat-item-container {
+			@include statCardAccent($carbon--purple-40);
+		}
+	}
+	.stat-item-container {
+		margin: 1rem 0;
+	}
+}
+
+@media (max-width: 770px) {
+	.compare-page-wrapper {
+		.stat-items-container {
+			grid-template-columns: 1fr 1fr 1fr;
+			grid-gap: .5rem;
+			.stat-item-container {
+				width: 100%;
+				.c--stat-number {
+					font-size: 2rem;
+				}
+				.c--fluctuation {
+					margin-top: 1rem;
+				}
+				.c--fluctuation,
+				.c--differential-label {
+					position: relative;
+					bottom: auto;
+					left: auto;
+					right: auto;
+				}
+			}
+		}
+		.c--compare-column {
+			min-width: 96px;
+			.c--country-name-label {
+				min-height: 5rem;
+			}
+		}
+	}	
+}
+
+@media (max-width: 530px) {
+	.compare-page-wrapper {
+		.stat-items-container {
+			grid-gap: .25rem;
+			.stat-item-container {
+				height: 10.75rem;
+				.c--stat-number {
+					font-size: 1.5rem;
+				}
+				.c--stat-label {
+					font-size: .75rem;
+					line-height: 1;
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 430px) {
+	.compare-page-wrapper {
+		.stat-items-container {
+			.stat-item-container {
+				.c--stat-number {
+					font-size: 1rem;
+				}
+			}
+		}
+	}
+}

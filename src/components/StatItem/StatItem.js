@@ -9,10 +9,7 @@ const StatItem = ({ statNumber, label, backButton, fluctuation, differential }) 
 		{!backButton ?
 		<div className="stat-item-container">
 			<p
-				className="c--stat-number"
-				style={{
-					fontSize: statNumber > 9999 && '2.625rem'
-				}}
+				className={`c--stat-number ${statNumber > 9999 ? 'c--large-stat-number' : ''}`}
 				>
 					{statNumber > 0 && statNumber}
 					{statNumber === 0 && '0'}

@@ -1,8 +1,8 @@
 import React from 'react';
 
-const PageWrapper = ({ children }) => {
+const PageWrapper = ({ children, classProp }) => {
 	return (
-		<div className="c--page-wrapper">
+		<div className={`c--page-wrapper ${classProp ? classProp : ''}`}>
 			{children}
 		</div>
 	);
