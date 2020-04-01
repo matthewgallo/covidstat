@@ -34,7 +34,7 @@ const ComparePage = ({ history, match }) => {
 					countriesToCompare.push(item);
 				}
 			})
-			if (countriesToCompare.length < 4) {
+			if (countriesToCompare.length < 4 && countriesToCompare.length > 1) {
 				dispatch(updateState('app', {
 					selectedCountriesToCompare: countriesToCompare
 				}))
