@@ -34,7 +34,7 @@ const ComparePage = ({ history, match }) => {
 					countriesToCompare.push(item);
 				}
 			})
-			if (countriesToCompare.length.length < 4) {
+			if (countriesToCompare.length < 4) {
 				dispatch(updateState('app', {
 					selectedCountriesToCompare: countriesToCompare
 				}))
@@ -104,7 +104,7 @@ const ComparePage = ({ history, match }) => {
 						const deathDifferential = deaths && yesterdaysDeaths && Math.round(Number(deaths) - Number(yesterdaysDeaths));
 						const recoveredDifferential = recovered && yesterdaysRecovered && Math.round(Number(recovered) - Number(yesterdaysRecovered));
 						return (
-							<div className={`c--compare-column c--compare-column-${i}`}>
+							<div className={`c--compare-column c--compare-column-${i}`} key={i}>
 								<p className="c--country-name-label">{item.country}</p>
 								<StatItem
 									statNumber={confirmedCases}
