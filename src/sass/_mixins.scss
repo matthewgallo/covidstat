@@ -2,3 +2,10 @@
 	outline: 0;
 	border: 1px solid $accentColor;
 }
+
+@mixin multiLineEllipsis($lineClampValue: 2) {
+	display: -webkit-box;
+	-webkit-line-clamp: $lineClampValue;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

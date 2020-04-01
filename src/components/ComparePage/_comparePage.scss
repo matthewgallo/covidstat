@@ -11,7 +11,7 @@
 
 .c--compare-column {
 	.c--country-name-label {
-		margin-bottom: 2rem;
+		@include multiLineEllipsis();
 	}
 	&.c--compare-column-0 {
 		.stat-item-container {
@@ -63,7 +63,7 @@
 		.c--compare-column {
 			min-width: 96px;
 			.c--country-name-label {
-				min-height: 5rem;
+				min-height: 3rem;
 			}
 		}
 	}	
