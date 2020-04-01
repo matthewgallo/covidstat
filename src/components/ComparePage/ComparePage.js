@@ -61,10 +61,8 @@ const ComparePage = ({ history, match }) => {
 	  const downloadCountryJSON = (event, currentCountries) => {
 		event.preventDefault();
 		const objectCountries = arrayToObject(currentCountries, 'country');
-		console.log(objectCountries);
 		let stringifiedJSON = JSON.stringify(objectCountries);
 		stringifiedJSON = [stringifiedJSON];
-		console.log(stringifiedJSON);
         const blob1 = new Blob(stringifiedJSON, { type: "text/plain;charset=utf-8" });
 		const isIE = false || !!document.documentMode;
         if (isIE) {
@@ -81,7 +79,6 @@ const ComparePage = ({ history, match }) => {
         }
 	}
 
-	console.log(selectedCountriesToCompare);
 	const latestDate = selectedCountriesToCompare?.length && selectedCountriesToCompare[0].data[selectedCountriesToCompare[0].data.length - 1].date;
 	// let latestDate;
 	return (
@@ -95,7 +92,6 @@ const ComparePage = ({ history, match }) => {
 					? selectedCountriesToCompare.map((item, i) => {
 						const latestCountryData = item.data[item.data.length - 1];
 						const yesterdaysData = item.data[item.data.length - 2];
-						console.log("latest country data: ", latestCountryData);
 						const confirmedCases = latestCountryData?.confirmed;
 						const deaths = latestCountryData?.deaths;
 						const recovered = latestCountryData?.recovered;
