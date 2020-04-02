@@ -16,11 +16,10 @@ ReactDOM.render(
     <Provider store={store}>
       <Router>
         { GA.init() && <GA.RouteTracker /> }
-        <Switch>
-          <>
         <Link to={'/'} className="header-link">
           <h4 className="c--website-name">Covid stat</h4>
         </Link>
+        <Switch>
         <Route exact
             path="/"
             component={Homepage}
@@ -33,10 +32,7 @@ ReactDOM.render(
             path="/compare/:countriesToCompare"
             component={ComparePage}
         />
-        <Route path="*"
-          component={FourOhFour}
-        />
-        </>
+        <Route path="*" component={FourOhFour}/>
         </Switch>
       </Router>
     </Provider>
