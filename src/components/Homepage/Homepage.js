@@ -47,8 +47,7 @@ function App(props) {
     const handleSearch = (event) => {
       // console.log(covidData);
       const searchValue = event.target.value.toLocaleLowerCase();
-      const updatedData = Object.entries(covidData);
-      let searchResults = updatedData.filter(country => country[0].toLocaleLowerCase().indexOf(searchValue) !== -1);
+      let searchResults = covidDataProperFormat.filter(item => item.country.toLocaleLowerCase().indexOf(searchValue) !== -1);
       searchResults.length = 8;
       dispatch(updateState(SCOPE, {
         searchResults
@@ -62,7 +61,7 @@ function App(props) {
 
     const setCurrentCountry = (urlFriendlyCountryName, country) => {
       dispatch(updateState(SCOPE, {
-        currentSelectedCountry: country,
+        currentSelectedCountry: [country],
         searchResults: []
       }))
       setActiveView('search');
@@ -70,11 +69,11 @@ function App(props) {
       props.history.push(`/country/${urlFriendlyCountryName}`)
     }
 
-    const renderSearchItem = country => {
-      const urlFriendlyCountryName = country[0].replace(/[. ,:-]+/g, "-").toLocaleLowerCase();
+    const renderSearchItem = item => {
+      const urlFriendlyCountryName = item.country.replace(/[. ,:-]+/g, "-").toLocaleLowerCase();
             return (
-              <Link onClick={() => setCurrentCountry(urlFriendlyCountryName, country)}>
-                <h2 className="c--search-result-item">{country[0]}</h2>
+              <Link onClick={() => setCurrentCountry(urlFriendlyCountryName, item)}>
+                <h2 className="c--search-result-item">{item.country}</h2>
               </Link>
             )
     }

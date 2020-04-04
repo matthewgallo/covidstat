@@ -9,6 +9,9 @@
 	background: #ffffff;
 	box-shadow:  24px 24px 47px #cccccc, 
 				-24px -24px 47px #ffffff;
+	&.active-selected-stat-item {
+		@include statCardAccent;
+	}
 	.c--stat-label {
 		position: absolute;
 		bottom: 1rem;

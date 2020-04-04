@@ -40,8 +40,51 @@
 	}
 }
 
+.c--main-content-container {
+	display: block;
+	.c--heatmap-container {
+		padding-bottom: 4rem;
+		padding-top: 2rem;
+		position: relative;
+		.heatmap-outer-container {
+			max-width: 100%;
+			min-width: 320px;
+			width: 400px;
+		}
+		.bx--dropdown__wrapper {
+			display: block;
+		}
+		.heatmap-tooltip-view-type-label {
+			@include carbon--font-weight('semibold');
+			text-transform: capitalize;
+		}
+		.heatmap-tooltip-stat {
+			@include carbon--font-family('mono');
+		}
+		.heatmap-tooltip-date-label {
+			@include carbon--type-style('label-01');
+			color: #4d5358;
+		}
+	}
+}
+
 @media (min-width: 522px) {
 	.stat-items-container {
 		grid-template-columns: repeat(2, 0fr);
+	}
+	.c--heatmap-container {
+		padding-top: 0;
+	}
+}
+
+@media (min-width: 970px) {
+	.c--main-content-container {
+		display: flex;
+		.c--heatmap-container {
+			margin-left: 4rem;
+			padding-bottom: 0;
+			padding-top: 0;
+			position: relative;
+		}
 	}
 }

@@ -111,19 +111,19 @@ const ComparePage = ({ history, match }) => {
 									statNumber={confirmedCases}
 									label={'Confirmed cases'}
 									fluctuation={confirmedCaseFluctuation}
-									differential={confirmedCaseDifferential}
+									countIncrease={confirmedCaseDifferential}
 								/>
 								<StatItem
 									statNumber={deaths}
 									label={'Deaths'}
 									fluctuation={deathFluctuation}
-									differential={deathDifferential}
+									countIncrease={deathDifferential}
 								/>
 								<StatItem
 									statNumber={recovered}
 									label={'Recovered'}
 									fluctuation={recoveredFluctuation}
-									differential={recoveredDifferential}
+									countIncrease={recoveredDifferential}
 								/>
 							</div>
 						)

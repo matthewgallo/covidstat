@@ -1,0 +1,172 @@
+Transforming data for heatmap
+
+1. Make array of objects, each object representing one week (7 days).
+
+2. Each week object should look something like:
+	2a. Each statistic (death count/case count/recovery count) needs to be set proportionally from a scale of 0 to 1
+	(ie the highest statistic in that category should be at the top of the scale, set to 1 and every other should be set proportionally to that.)
+{ // this represents week 1
+	bin: 0,
+	bins: [ // array will have 7 items, one for each days of the week
+		{
+			bin: 0,
+			deathCount: X
+		},
+		{
+			bin: 150,
+			deathCount: X
+		}
+		....
+		....
+		....
+		....
+		....
+		{
+			bin: 900,
+			deathCount: X
+		}
+	]
+}
+
+
+
+
+example data:
+[
+	{
+		bin/week: 0,
+		bins/days: [
+			array of seven items/days
+			0: {
+				bin: 0,
+				deathCount: X
+			},
+			1: {
+				bin: 150,
+				deathCount: X
+			},
+			2: {
+				bin: 300,
+				deathCount: X
+			},
+			3: {
+				bin: 450,
+				deathCount: X
+			},
+			4: {
+				bin: 600,
+				deathCount: X
+			},
+			5: {
+				bin: 750,
+				deathCount: X
+			},
+			6: {
+				bin: 900,
+				deathCount: X
+			}
+		]
+	},
+	{
+		bin/week: 0,
+		bins/days: [
+			array of seven items/days
+			0: {
+				bin: 0,
+				deathCount: X
+			},
+			1: {
+				bin: 150,
+				deathCount: X
+			},
+			2: {
+				bin: 300,
+				deathCount: X
+			},
+			3: {
+				bin: 450,
+				deathCount: X
+			},
+			4: {
+				bin: 600,
+				deathCount: X
+			},
+			5: {
+				bin: 750,
+				deathCount: X
+			},
+			6: {
+				bin: 900,
+				deathCount: X
+			}
+		]
+	},
+	{
+		bin/week: 0,
+		bins/days: [
+			array of seven items/days
+			0: {
+				bin: 0,
+				deathCount: X
+			},
+			1: {
+				bin: 150,
+				deathCount: X
+			},
+			2: {
+				bin: 300,
+				deathCount: X
+			},
+			3: {
+				bin: 450,
+				deathCount: X
+			},
+			4: {
+				bin: 600,
+				deathCount: X
+			},
+			5: {
+				bin: 750,
+				deathCount: X
+			},
+			6: {
+				bin: 900,
+				deathCount: X
+			}
+		]
+	},
+	{
+		bin/week: 0,
+		bins/days: [
+			array of seven items/days
+			0: {
+				bin: 0,
+				deathCount: X
+			},
+			1: {
+				bin: 150,
+				deathCount: X
+			},
+			2: {
+				bin: 300,
+				deathCount: X
+			},
+			3: {
+				bin: 450,
+				deathCount: X
+			},
+			4: {
+				bin: 600,
+				deathCount: X
+			},
+			5: {
+				bin: 750,
+				deathCount: X
+			},
+			6: {
+				bin: 900,
+				deathCount: X
+			}
+		]
+	}
+]

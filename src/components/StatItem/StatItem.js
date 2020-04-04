@@ -2,12 +2,12 @@ import React from 'react';
 import LeftArrow20 from '@carbon/icons-react/lib/arrow--left/20';
 import { SkeletonPlaceholder } from 'carbon-components-react';
 
-const StatItem = ({ statNumber, label, backButton, fluctuation, differential }) => {
+const StatItem = ({ statNumber, label, backButton, fluctuation, countIncrease, activeStatItem }) => {
 	const modifiedFluctuation = `${fluctuation}`;
 	return (
 		<>
 		{!backButton ?
-		<div className="stat-item-container">
+		<div className={`stat-item-container ${activeStatItem ? 'active-selected-stat-item' : ''}`}>
 			<p
 				className={`c--stat-number ${statNumber > 9999 ? 'c--large-stat-number' : ''}`}
 				>
@@ -21,7 +21,7 @@ const StatItem = ({ statNumber, label, backButton, fluctuation, differential }) 
 				}}/>}
 				{'*'}
 			</p>
-			<p className="c--differential-label">{differential > 0 ? `+${differential}\u00B0` : ''}</p>
+			<p className="c--differential-label">{countIncrease > 0 ? `${countIncrease}\u00B0` : ''}</p>
 			<p className="c--stat-label">{label}</p>
 		</div>
 		: <div className="stat-item-container">
