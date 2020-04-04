@@ -53,6 +53,7 @@ const CountryDetails = props => {
 		setHeatmapType(view);
 		let binCount = 0;
 			const updatedCountryData = countryDataset.map((item, i) => {
+				const dailyCount = i > 0 ? item[view] - countryDataset[i - 1][view] : item[view];
 				if (i % 7 === 0) {
 					binCount = 0
 				} else {
@@ -61,7 +62,7 @@ const CountryDetails = props => {
 				return ({
 					...item,
 					bin: binCount,
-					count: item[view]
+					count: dailyCount,
 				});;
 			});
 			return updatedCountryData;

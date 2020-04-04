@@ -45,7 +45,6 @@ function App(props) {
   }, [dispatch]);
     
     const handleSearch = (event) => {
-      // console.log(covidData);
       const searchValue = event.target.value.toLocaleLowerCase();
       let searchResults = covidDataProperFormat.filter(item => item.country.toLocaleLowerCase().indexOf(searchValue) !== -1);
       searchResults.length = 8;
@@ -59,7 +58,8 @@ function App(props) {
       }
     }
 
-    const setCurrentCountry = (urlFriendlyCountryName, country) => {
+    const setCurrentCountry = (event, urlFriendlyCountryName, country) => {
+      event.preventDefault();
       dispatch(updateState(SCOPE, {
         currentSelectedCountry: [country],
         searchResults: []
@@ -72,7 +72,7 @@ function App(props) {
     const renderSearchItem = item => {
       const urlFriendlyCountryName = item.country.replace(/[. ,:-]+/g, "-").toLocaleLowerCase();
             return (
-              <Link onClick={() => setCurrentCountry(urlFriendlyCountryName, item)}>
+              <Link key={item.country} to="/" onClick={event => setCurrentCountry(event, urlFriendlyCountryName, item)}>
                 <h2 className="c--search-result-item">{item.country}</h2>
               </Link>
             )

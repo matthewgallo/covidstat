@@ -138,7 +138,7 @@ export default ({
             {tooltipData.date}
           </p>
           <p className="heatmap-tooltip-stat">
-            {tooltipData[type]}
+            {tooltipData.count}
           </p>
         </TooltipWithBounds>
       )}
