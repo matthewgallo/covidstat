@@ -63,7 +63,7 @@ const CountryDetails = props => {
 					...item,
 					bin: binCount,
 					count: dailyCount,
-				});;
+				});
 			});
 			return updatedCountryData;
 	}
