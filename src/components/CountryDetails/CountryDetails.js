@@ -87,6 +87,7 @@ const CountryDetails = props => {
 	const checkCountryIsObject = currentCountry && currentCountry[0];
 	const latestData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 1];
 	const yesterdaysData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 2];
+	const dayBeforeYesterdaysData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 3];
 	const latestDate = latestData?.date;
 	const confirmedCases = latestData?.confirmed;
 	const deaths = latestData?.deaths;
@@ -94,14 +95,27 @@ const CountryDetails = props => {
 	const yesterdaysConfirmedCases = yesterdaysData?.confirmed;
 	const yesterdaysDeaths = yesterdaysData?.deaths;
 	const yesterdaysRecovered = yesterdaysData?.recovered;
+	const dayBeforeYesterdaysConfirmedCases = dayBeforeYesterdaysData?.confirmed;
+	const dayBeforeYesterdaysDeaths = dayBeforeYesterdaysData?.deaths;
+	const dayBeforeYesterdaysRecovered = dayBeforeYesterdaysData?.recovered;
 
-	const confirmedCaseFluctuation = confirmedCases && yesterdaysConfirmedCases && Math.round(((Number(confirmedCases) / Number(yesterdaysConfirmedCases))*100) - 100);
-	const deathFluctuation = deaths && yesterdaysDeaths && Math.round(((Number(deaths) / Number(yesterdaysDeaths))*100) - 100);
-	const recoveredFluctuation = recovered && yesterdaysRecovered && Math.round(((Number(recovered) / Number(yesterdaysRecovered))*100) - 100);
 	
 	const confirmedCaseDifferential = confirmedCases && yesterdaysConfirmedCases && Math.round(Number(confirmedCases) - Number(yesterdaysConfirmedCases));
 	const deathDifferential = deaths && yesterdaysDeaths && Math.round(Number(deaths) - Number(yesterdaysDeaths));
 	const recoveredDifferential = recovered && yesterdaysRecovered && Math.round(Number(recovered) - Number(yesterdaysRecovered));
+
+	const yesterdayconfirmedCaseDifferential = yesterdaysConfirmedCases && dayBeforeYesterdaysConfirmedCases && Math.round(Number(yesterdaysConfirmedCases) - Number(dayBeforeYesterdaysConfirmedCases));
+	const yesterdaydeathDifferential = yesterdaysDeaths && dayBeforeYesterdaysDeaths && Math.round(Number(yesterdaysDeaths) - Number(dayBeforeYesterdaysDeaths));
+	const yesterdayrecoveredDifferential = yesterdaysRecovered && dayBeforeYesterdaysRecovered && Math.round(Number(yesterdaysRecovered) - Number(dayBeforeYesterdaysRecovered));
+
+	const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
+	const finalConfirmedFluctuation = confirmedCaseFluctuation < 100 ? `-${100 - confirmedCaseFluctuation}` : `+${confirmedCaseFluctuation - 100}`;
+	
+	const deathFluctuation = deathDifferential && yesterdaydeathDifferential ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
+	const finalDeathFluctuation = deathFluctuation < 100 ? `-${100 - deathFluctuation}` : `+${deathFluctuation - 100}`;
+	
+	const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
+	const finalRecoveredFluctuation = recoveredFluctuation < 100 ? `-${100 - recoveredFluctuation}` : `+${recoveredFluctuation - 100}`;
 	
 	const downloadCountryJSON = (event, currentCountry) => {
 		event.preventDefault();
@@ -163,21 +177,21 @@ const CountryDetails = props => {
 					<StatItem
 						statNumber={confirmedCases}
 						label={'Confirmed cases'}
-						fluctuation={confirmedCaseFluctuation}
+						fluctuation={finalConfirmedFluctuation}
 						countIncrease={confirmedCaseDifferential}
 						activeStatItem={heatmapType === 'confirmed' ? true : false}
 						/>
 					<StatItem
 						statNumber={deaths}
 						label={'Deaths'}
-						fluctuation={deathFluctuation}
+						fluctuation={finalDeathFluctuation}
 						countIncrease={deathDifferential}
 						activeStatItem={heatmapType === 'deaths' ? true : false}
 						/>
 					<StatItem
 						statNumber={recovered}
 						label={'Recovered'}
-						fluctuation={recoveredFluctuation}
+						fluctuation={finalRecoveredFluctuation}
 						countIncrease={recoveredDifferential}
 						activeStatItem={heatmapType === 'recovered' ? true : false}
 					/>
