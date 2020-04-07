@@ -108,15 +108,24 @@ const CountryDetails = props => {
 	const yesterdaydeathDifferential = yesterdaysDeaths && dayBeforeYesterdaysDeaths && Math.round(Number(yesterdaysDeaths) - Number(dayBeforeYesterdaysDeaths));
 	const yesterdayrecoveredDifferential = yesterdaysRecovered && dayBeforeYesterdaysRecovered && Math.round(Number(yesterdaysRecovered) - Number(dayBeforeYesterdaysRecovered));
 
-	const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
-	const finalConfirmedFluctuation = confirmedCaseFluctuation < 100 ? `-${100 - confirmedCaseFluctuation}` : `+${confirmedCaseFluctuation - 100}`;
-	
-	const deathFluctuation = deathDifferential && yesterdaydeathDifferential ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
-	const finalDeathFluctuation = deathFluctuation < 100 ? `-${100 - deathFluctuation}` : `+${deathFluctuation - 100}`;
-	
-	const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
-	const finalRecoveredFluctuation = recoveredFluctuation < 100 ? `-${100 - recoveredFluctuation}` : `+${recoveredFluctuation - 100}`;
-	
+	const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential !== 0 ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
+	const finalConfirmedFluctuation = typeof confirmedCaseFluctuation !== 'string' && confirmedCaseFluctuation < 100
+		? `-${100 - confirmedCaseFluctuation}`
+		: yesterdayconfirmedCaseDifferential === 0 ? `+${confirmedCaseDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+		: `+${confirmedCaseFluctuation - 100}`;
+		
+	const deathFluctuation = deathDifferential && yesterdaydeathDifferential !== 0 ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
+	const finalDeathFluctuation = typeof deathFluctuation !== 'string' && deathFluctuation < 100
+		? `-${100 - deathFluctuation}`
+		: yesterdaydeathDifferential === 0 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+		: `+${deathFluctuation - 100}`;
+		
+	const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential !== 0 ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
+	const finalRecoveredFluctuation = typeof recoveredFluctuation !== 'string' && recoveredFluctuation < 100
+		? `-${100 - recoveredFluctuation}`
+		: yesterdayrecoveredDifferential === 0 ? `+${recoveredDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+		: `+${recoveredFluctuation - 100}`;
+
 	const downloadCountryJSON = (event, currentCountry) => {
 		event.preventDefault();
 		const jsonCountry = {...currentCountry};
@@ -169,8 +178,8 @@ const CountryDetails = props => {
 		<PageWrapper>
 			<h1>{currentCountry ? currentCountry[0].country : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}</h1>
 			{latestData ? <p className="c--last-updated">Last updated {latestDate}</p> : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}
-			<p className="c--fluctuation-label">&#176; Daily increase (count)</p>
-			<p className="c--fluctuation-label">* Daily increase (percent)</p>
+			<p className="c--fluctuation-label">&#176; Daily count</p>
+			<p className="c--fluctuation-label">* Daily fluctuation</p>
 			<div className="c--main-content-container">
 
 				<div className="stat-items-container">
