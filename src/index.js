@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import Homepage from './components/Homepage/Homepage';
-import { Provider } from 'react-redux';
-import store from './redux/Store';
+import store from './store/index';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { StoreContext } from 'storeon/react';
 import CountryDetails from './components/CountryDetails/CountryDetails';
 import ComparePage from './components/ComparePage/ComparePage';
 import FourOhFour from './components/FourOhFour/FourOhFour.js';
@@ -13,7 +13,7 @@ import GA from './utils/GoogleAnalytics'
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <StoreContext.Provider value={store}>
       <Router>
         { GA.init() && <GA.RouteTracker /> }
         <Link to={'/'} className="header-link">
@@ -35,7 +35,7 @@ ReactDOM.render(
         <Route path="*" component={FourOhFour}/>
         </Switch>
       </Router>
-    </Provider>
+    </StoreContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
