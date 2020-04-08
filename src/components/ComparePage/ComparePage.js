@@ -1,55 +1,44 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import PageWrapper from '../PageWrapper/PageWrapper';
-import { useDispatch, useSelector } from 'react-redux';
+import { useStoreon } from 'storeon/react';
 import { Link } from 'react-router-dom';
 import LeftArrow20 from '@carbon/icons-react/lib/arrow--left/20';
 import Download20 from '@carbon/icons-react/lib/download/20';
 import { RestApi } from '../../utils/RestApi';
-import { updateState } from '../../redux/commonActions';
 import StatItem from '../StatItem/StatItem';
 
 const ComparePage = ({ history, match }) => {
+	const { dispatch, covidDataProperFormat, selectedCountriesToCompare } = useStoreon('covidDataProperFormat', 'selectedCountriesToCompare');
 
-	const dispatch = useDispatch();
-	const selectedCountriesToCompare = useSelector(state => state['app'] && state['app'].selectedCountriesToCompare);
+	const fetchData = useCallback(async () => {
+		dispatch('covidData/get', await RestApi.get('https://pomber.github.io/covid19/timeseries.json'));
+	}, [dispatch])
 
-	
-	useEffect(() => {
-		const fetchData = async (countryParamsArray) => {
-			const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-			covidData['United States'] = covidData['US'];
-			delete covidData['US'];
-			const mutatedData = Object.entries(covidData);
-			const covidDataProperFormat = mutatedData.map(dataItem => { 
-				return { 
-					country: dataItem[0], 
-					data: dataItem[1] 
-				}; 
-			});
-	
-			let countriesToCompare = [];
-			covidDataProperFormat.forEach(item => {
+	const getSelectedCountries = useCallback(countryParamsArray => {
+		let countriesToCompare = [];
+		if (!covidDataProperFormat) {
+			fetchData();
+		} else {
+			covidDataProperFormat && covidDataProperFormat.forEach(item => {
 				if (countryParamsArray.includes(item.country.toLowerCase())) {
 					// updatedData.filter(country => country[0].toLocaleLowerCase() === searchValue);
 					countriesToCompare.push(item);
 				}
 			})
 			if (countriesToCompare.length < 4 && countriesToCompare.length > 1) {
-				dispatch(updateState('app', {
-					selectedCountriesToCompare: countriesToCompare
-				}))
+				dispatch('setSelectedCountries', countriesToCompare)
 			} else {
 				history.push('/');
 			}
+		}
+	}, [covidDataProperFormat, dispatch, history, fetchData])
 	
-		}
+	useEffect(() => {
 		// code to run on component mount
-		if (!selectedCountriesToCompare) {
-			const countryParams = match.params.countriesToCompare.split("+").join(",").replace(/-/g, ' ');
-			const countryParamsArray = countryParams.split(',');
-			fetchData(countryParamsArray)
-		}
-	  }, [dispatch, history, match, selectedCountriesToCompare]);
+		const countryParams = match.params.countriesToCompare.split("+").join(",").replace(/-/g, ' ');
+		const countryParamsArray = countryParams.split(',');
+		getSelectedCountries(countryParamsArray);
+	  }, [getSelectedCountries, match.params.countriesToCompare, covidDataProperFormat]);
 
 	  const arrayToObject = (array, keyField) =>
 		array.reduce((obj, item) => {
@@ -83,46 +72,70 @@ const ComparePage = ({ history, match }) => {
 		<PageWrapper classProp="compare-page-wrapper">
 			<h1>Compare</h1>
 			<p className="c--last-updated">Last updated {latestDate ? latestDate : ''}</p>
-			<p className="c--fluctuation-label">&#176; Daily increase (count)</p>
-			<p className="c--fluctuation-label">* Daily increase (percent)</p>
+			<p className="c--fluctuation-label">&#176; Daily count</p>
+			<p className="c--fluctuation-label">* Daily fluctuation</p>
 			<div className={`stat-items-container ${selectedCountriesToCompare?.length === 2 ? 'stat-items-container-mobile-2' : 'stat-items-container-mobile-3'}`}
 			>
 				{selectedCountriesToCompare && selectedCountriesToCompare.length
 					? selectedCountriesToCompare.map((item, i) => {
-						const latestCountryData = item.data[item.data.length - 1];
-						const yesterdaysData = item.data[item.data.length - 2];
-						const confirmedCases = latestCountryData?.confirmed;
-						const deaths = latestCountryData?.deaths;
-						const recovered = latestCountryData?.recovered;
+						const latestData = item && item.data[item && item.data.length - 1];
+						const yesterdaysData = item && item.data[item.data.length - 2];
+						const dayBeforeYesterdaysData = item && item.data[item.data.length - 3];
+						const confirmedCases = latestData?.confirmed;
+						const deaths = latestData?.deaths;
+						const recovered = latestData?.recovered;
 						const yesterdaysConfirmedCases = yesterdaysData?.confirmed;
 						const yesterdaysDeaths = yesterdaysData?.deaths;
 						const yesterdaysRecovered = yesterdaysData?.recovered;
-						const confirmedCaseFluctuation = confirmedCases && yesterdaysConfirmedCases && Math.round(((Number(confirmedCases) / Number(yesterdaysConfirmedCases))*100) - 100);
-						const deathFluctuation = deaths && yesterdaysDeaths && Math.round(((Number(deaths) / Number(yesterdaysDeaths))*100) - 100);
-						const recoveredFluctuation = recovered && yesterdaysRecovered && Math.round(((Number(recovered) / Number(yesterdaysRecovered))*100) - 100);
+						const dayBeforeYesterdaysConfirmedCases = dayBeforeYesterdaysData?.confirmed;
+						const dayBeforeYesterdaysDeaths = dayBeforeYesterdaysData?.deaths;
+						const dayBeforeYesterdaysRecovered = dayBeforeYesterdaysData?.recovered;
+
 						
 						const confirmedCaseDifferential = confirmedCases && yesterdaysConfirmedCases && Math.round(Number(confirmedCases) - Number(yesterdaysConfirmedCases));
 						const deathDifferential = deaths && yesterdaysDeaths && Math.round(Number(deaths) - Number(yesterdaysDeaths));
 						const recoveredDifferential = recovered && yesterdaysRecovered && Math.round(Number(recovered) - Number(yesterdaysRecovered));
+
+						const yesterdayconfirmedCaseDifferential = yesterdaysConfirmedCases && dayBeforeYesterdaysConfirmedCases && Math.round(Number(yesterdaysConfirmedCases) - Number(dayBeforeYesterdaysConfirmedCases));
+						const yesterdaydeathDifferential = yesterdaysDeaths && dayBeforeYesterdaysDeaths && Math.round(Number(yesterdaysDeaths) - Number(dayBeforeYesterdaysDeaths));
+						const yesterdayrecoveredDifferential = yesterdaysRecovered && dayBeforeYesterdaysRecovered && Math.round(Number(yesterdaysRecovered) - Number(dayBeforeYesterdaysRecovered));
+
+						const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential !== 0 ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
+						const finalConfirmedFluctuation = typeof confirmedCaseFluctuation !== 'string' && confirmedCaseFluctuation < 100
+							? `-${100 - confirmedCaseFluctuation}`
+							: yesterdayconfirmedCaseDifferential === 0 ? `+${confirmedCaseDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+							: `+${confirmedCaseFluctuation - 100}`;
+							
+						const deathFluctuation = deathDifferential && yesterdaydeathDifferential !== 0 ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
+						const finalDeathFluctuation = typeof deathFluctuation !== 'string' && deathFluctuation < 100
+							? `-${100 - deathFluctuation}`
+							: yesterdaydeathDifferential === 0 && deathFluctuation > 100 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+							: `+${deathFluctuation - 100}`;
+							
+						const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential !== 0 ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
+						const finalRecoveredFluctuation = typeof recoveredFluctuation !== 'string' && recoveredFluctuation < 100
+							? `-${100 - recoveredFluctuation}`
+							: yesterdayrecoveredDifferential === 0 ? `+${recoveredDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+							: `+${recoveredFluctuation - 100}`;
 						return (
 							<div className={`c--compare-column c--compare-column-${i}`} key={i}>
 								<p className="c--country-name-label">{item.country}</p>
 								<StatItem
 									statNumber={confirmedCases}
 									label={'Confirmed cases'}
-									fluctuation={confirmedCaseFluctuation}
+									fluctuation={finalConfirmedFluctuation}
 									countIncrease={confirmedCaseDifferential}
 								/>
 								<StatItem
 									statNumber={deaths}
 									label={'Deaths'}
-									fluctuation={deathFluctuation}
+									fluctuation={finalDeathFluctuation}
 									countIncrease={deathDifferential}
 								/>
 								<StatItem
 									statNumber={recovered}
 									label={'Recovered'}
-									fluctuation={recoveredFluctuation}
+									fluctuation={finalRecoveredFluctuation}
 									countIncrease={recoveredDifferential}
 								/>
 							</div>

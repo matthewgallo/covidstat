@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateState } from '../../redux/commonActions';
+import { useStoreon } from 'storeon/react';
 import { RestApi } from '../../utils/RestApi';
 import PageWrapper from '../PageWrapper/PageWrapper';
 import StatItem from '../StatItem/StatItem';
@@ -13,41 +12,47 @@ import { Dropdown } from 'carbon-components-react';
 import { chunk } from '../../utils/chunk';
 
 const CountryDetails = props => {
-	const dispatch = useDispatch();
+	const { dispatch, covidDataProperFormat, currentSelectedCountry } = useStoreon('covidDataProperFormat', 'currentSelectedCountry');
 	const [finalHeatmapData, setFinalHeatmapData] = useState([]);
 	const [heatmapType, setHeatmapType] = useState('confirmed');
-	const currentCountry = useSelector(state => state['app'] && state['app'].currentSelectedCountry)
 
 	
-	useEffect(() => {
-		const fetchData = async (countryURLName) => {
-			const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-			covidData['United States'] = covidData['US'];
-			delete covidData['US'];
-			const searchValue = countryURLName.toLocaleLowerCase();
-			const updatedData = Object.entries(covidData);
-			const covidDataProperFormat = updatedData.map(dataItem => { 
-				return { 
-					country: dataItem[0], 
-					data: dataItem[1] 
-				}; 
-			});
-			let searchResult = covidDataProperFormat.filter(country => country.country.toLocaleLowerCase() === searchValue);
-			if (searchResult.length) {
-				dispatch(updateState('app', {
-					currentSelectedCountry: searchResult
-				}))
-			} else {
-				props.history.push('/');
-			}
-		  }
-		// code to run on component mount
-		if (!currentCountry) {
-			const countryURLName = props.match.params.countryFriendlyName.replace(/-/g, ' ');
-			fetchData(countryURLName)
+	const fetchData = useCallback(async () => {
+		dispatch('covidData/get', await RestApi.get('https://pomber.github.io/covid19/timeseries.json'));
+	}, [dispatch]);
+	
+	const findCurrentSelectedCountry = useCallback(() => {
+		const countryURLName = props.match.params.countryFriendlyName.replace(/-/g, ' ');
+		const searchValue = countryURLName.toLocaleLowerCase();
+		let searchResult = covidDataProperFormat && covidDataProperFormat.filter(country => country.country.toLocaleLowerCase() === searchValue);
+		if (!currentSelectedCountry && !covidDataProperFormat) {
+			fetchData();
 		}
-	  }, [currentCountry, dispatch, props.match.params.countryFriendlyName, props.history]);
+		if (covidDataProperFormat && !currentSelectedCountry) {
+			dispatch('setCurrentCountry', searchResult && searchResult.length && searchResult);
+		} else if (searchResult && !searchResult.length) {
+			props.history.push('/');
+		}
+	}, [currentSelectedCountry, covidDataProperFormat, fetchData, dispatch, props.match.params.countryFriendlyName, props.history]);
 
+
+	useEffect(() => {
+		// code to run on component mount
+		if (currentSelectedCountry) {
+			let countryDataset = currentSelectedCountry[0].data;
+			const updatedCountryData = setHeatMapView(countryDataset, 'confirmed')
+			const countryDataByWeek = chunk(updatedCountryData, 7);
+			const finalHeatmapData = countryDataByWeek.map((week, i) => {
+				return ({
+					bin: i,
+					bins: [...week]
+				})
+			});
+			setFinalHeatmapData(finalHeatmapData);
+		} else {
+			findCurrentSelectedCountry();
+		}
+	}, [fetchData, findCurrentSelectedCountry, dispatch, props.match.params.countryFriendlyName, props.history, covidDataProperFormat, currentSelectedCountry]);
 
 	const setHeatMapView = (countryDataset, view) => {
 		setHeatmapType(view);
@@ -68,26 +73,10 @@ const CountryDetails = props => {
 			return updatedCountryData;
 	}
 
-
-	useEffect(() => {
-		if (currentCountry) {
-			let countryDataset = currentCountry[0].data;
-			const updatedCountryData = setHeatMapView(countryDataset, 'confirmed')
-			const countryDataByWeek = chunk(updatedCountryData, 7);
-			const finalHeatmapData = countryDataByWeek.map((week, i) => {
-				return ({
-					bin: i,
-					bins: [...week]
-				})
-			});
-			setFinalHeatmapData(finalHeatmapData);
-		};
-	}, [currentCountry])
-
-	const checkCountryIsObject = currentCountry && currentCountry[0];
-	const latestData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 1];
-	const yesterdaysData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 2];
-	const dayBeforeYesterdaysData = currentCountry && checkCountryIsObject.data[checkCountryIsObject.data.length - 3];
+	const countryData = currentSelectedCountry && currentSelectedCountry[0];
+	const latestData = countryData && countryData.data[countryData && countryData.data.length - 1];
+	const yesterdaysData = countryData && countryData.data[countryData.data.length - 2];
+	const dayBeforeYesterdaysData = countryData && countryData.data[countryData.data.length - 3];
 	const latestDate = latestData?.date;
 	const confirmedCases = latestData?.confirmed;
 	const deaths = latestData?.deaths;
@@ -117,7 +106,7 @@ const CountryDetails = props => {
 	const deathFluctuation = deathDifferential && yesterdaydeathDifferential !== 0 ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
 	const finalDeathFluctuation = typeof deathFluctuation !== 'string' && deathFluctuation < 100
 		? `-${100 - deathFluctuation}`
-		: yesterdaydeathDifferential === 0 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
+		: yesterdaydeathDifferential === 0 && deathFluctuation > 100 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
 		: `+${deathFluctuation - 100}`;
 		
 	const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential !== 0 ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
@@ -148,7 +137,7 @@ const CountryDetails = props => {
 	}
 
 	const heatmapChange = event => {
-		const updatedCountryData = setHeatMapView(currentCountry[0].data, event.selectedItem.id);
+		const updatedCountryData = setHeatMapView(currentSelectedCountry[0].data, event.selectedItem.id);
 		const countryDataByWeek = chunk(updatedCountryData, 7);
 			const finalHeatmapData = countryDataByWeek.map((week, i) => {
 				return ({
@@ -176,7 +165,7 @@ const CountryDetails = props => {
 
 	return (
 		<PageWrapper>
-			<h1>{currentCountry ? currentCountry[0].country : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}</h1>
+			<h1>{currentSelectedCountry ? currentSelectedCountry[0].country : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}</h1>
 			{latestData ? <p className="c--last-updated">Last updated {latestDate}</p> : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}
 			<p className="c--fluctuation-label">&#176; Daily count</p>
 			<p className="c--fluctuation-label">* Daily fluctuation</p>
@@ -224,8 +213,8 @@ const CountryDetails = props => {
 			<Link to={'/'} className="floating-button-link back-home-link">
 				<LeftArrow20 />
 			</Link>
-			{currentCountry && currentCountry.length &&
-				<Link to={'/'} className="floating-button-link download-button-link" onClick={event => downloadCountryJSON(event, currentCountry)}>
+			{currentSelectedCountry && currentSelectedCountry.length &&
+				<Link to={'/'} className="floating-button-link download-button-link" onClick={event => downloadCountryJSON(event, currentSelectedCountry)}>
 					<Download20 />
 				</Link>
 			}

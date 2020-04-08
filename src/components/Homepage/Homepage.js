@@ -1,71 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { RestApi } from '../../utils/RestApi';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateState } from '../../redux/commonActions';
+import { useStoreon } from 'storeon/react';
 import { Button, MultiSelect, TextInput } from 'carbon-components-react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../PageWrapper/PageWrapper';
 import { Search16, Compare16 } from '@carbon/icons-react';
 
-
-const SCOPE = 'app';
 function App(props) {
-  const dispatch = useDispatch();
+
+  const { dispatch, covidDataProperFormat, searchResults, selectedCountriesToCompare } = useStoreon('covidDataProperFormat', 'searchResults', 'selectedCountriesToCompare');
   const [multiSelectInvalid, setMultiSelectInvalid] = useState(false);
   const [activeView, setActiveView] = useState('search');
-  // const [previousCountries, setPreviousCountries] = useState([]);
-  const covidData = useSelector(state => state[SCOPE] && state[SCOPE].covidData);
-  const covidDataProperFormat = useSelector(state => state[SCOPE] && state[SCOPE].covidDataProperFormat);
-  const selectedCountriesToCompare = useSelector(state => state[SCOPE] && state[SCOPE].selectedCountriesToCompare);
-  const searchResults = useSelector(state => state[SCOPE] && state[SCOPE].searchResults);
   
 
   useEffect(() => {
     const fetchData = async () => {
-      const covidData = await RestApi.get('https://pomber.github.io/covid19/timeseries.json');
-      covidData['United States'] = covidData['US'];
-      delete covidData['US'];
-      const mutatedData = Object.entries(covidData);
-      const covidDataProperFormat = mutatedData.map(dataItem => { 
-        return { 
-          country: dataItem[0], 
-          data: dataItem[1] 
-        }; 
-      });
-      dispatch(updateState(SCOPE, {
-        covidData,
-        covidDataProperFormat,
-        currentSelectedCountry: [],
-        selectedCountriesToCompare: []
-      }))
+      dispatch('covidData/get', await RestApi.get('https://pomber.github.io/covid19/timeseries.json'));
     }
-    // code to run on component mount
-    fetchData();
-  }, [dispatch]);
+      fetchData();
+    }, [dispatch]);
     
     const handleSearch = (event) => {
       const searchValue = event.target.value.toLocaleLowerCase();
-      let searchResults = covidDataProperFormat.filter(item => item.country.toLocaleLowerCase().indexOf(searchValue) !== -1);
+      let searchResults = covidDataProperFormat && covidDataProperFormat.filter(item => item.country.toLocaleLowerCase().indexOf(searchValue) !== -1);
       searchResults.length = 8;
-      dispatch(updateState(SCOPE, {
-        searchResults
-      }))
+      dispatch('setSearchResults', searchResults);
       if (searchValue === '') {
-        dispatch(updateState(SCOPE, {
-          searchResults: []
-        }))
+        dispatch('setSearchResults', []);
       }
     }
 
     const setCurrentCountry = (event, urlFriendlyCountryName, country) => {
       event.preventDefault();
-      dispatch(updateState(SCOPE, {
-        currentSelectedCountry: [country],
-        searchResults: []
-      }))
+      dispatch('setCurrentCountry', [country]);
+      dispatch('setSearchResults', []);
       setActiveView('search');
-      // setPreviousCountries(oldCountries => [...oldCountries, country]);
       props.history.push(`/country/${urlFriendlyCountryName}`)
     }
 
@@ -79,27 +49,20 @@ function App(props) {
     }
 
     const toggleView = view => {
-      setActiveView(view)
-      dispatch(updateState(SCOPE, {
-        selectedCountriesToCompare: [],
-      }));
+      setActiveView(view);
+      dispatch('setSelectedCountries', [])
+      dispatch('setSearchResults', [])
     }
-
+    
     const multiSelectChange = event => {
-        dispatch(updateState(SCOPE, {
-          selectedCountriesToCompare: event.selectedItems
-        }));
+        dispatch('setSelectedCountries', event.selectedItems)
         if (event.selectedItems && event.selectedItems.length > 3) {
-          dispatch(updateState(SCOPE, {
-            multiSelectInvalid: setMultiSelectInvalid(true),
-          }))
+          setMultiSelectInvalid(true)
         }
         if ((event.selectedItems && event.selectedItems.length === 3) ||
           (event.selectedItems && event.selectedItems.length === 2)
           ) {
-          dispatch(updateState(SCOPE, {
-            multiSelectInvalid: setMultiSelectInvalid(false),
-          }))
+          setMultiSelectInvalid(false)
         }
     }
 
@@ -107,9 +70,7 @@ function App(props) {
       if ((selectedCountriesToCompare && selectedCountriesToCompare.length === 1) ||
       !selectedCountriesToCompare?.length
       ) {
-          dispatch(updateState(SCOPE, {
-            multiSelectInvalid: setMultiSelectInvalid(true),
-          }));
+          setMultiSelectInvalid(true)
           return;
       }
       if (multiSelectInvalid) {
@@ -147,7 +108,7 @@ function App(props) {
           {activeView === 'search'
           ? <>
           <TextInput
-            disabled={!covidData ? true : false}
+            disabled={!covidDataProperFormat ? true : false}
             onChange={event => handleSearch(event)}
             id="c--main-search-input"
             placeholder="Search by country"
@@ -157,7 +118,7 @@ function App(props) {
           : <>
           <MultiSelect.Filterable
             ariaLabel="Choose an item"
-            disabled={false}
+            disabled={!covidDataProperFormat ? true : false}
             id="c--main-multi-select"
             itemToString={item => (item ? item.country : "")}
             items={covidDataProperFormat ? covidDataProperFormat : []}
@@ -185,7 +146,6 @@ function App(props) {
 }
 
 App.propTypes = {
-  covidData: PropTypes.object,
   searchAttributes: PropTypes.array,
   searchSettings: PropTypes.object,
   currentSelectedCountry: PropTypes.array,

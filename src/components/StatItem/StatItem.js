@@ -21,7 +21,9 @@ const StatItem = ({ statNumber, label, backButton, fluctuation, countIncrease, a
 				}}/>}
 				{'*'}
 			</p>
-			<p className="c--differential-label">{countIncrease > 0 ? `${countIncrease}\u00B0` : ''}</p>
+			<p className="c--differential-label">
+				{countIncrease && `${countIncrease}\u00B0`}
+			</p>
 			<p className="c--stat-label">{label}</p>
 		</div>
 		: <div className="stat-item-container">
