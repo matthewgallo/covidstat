@@ -8,7 +8,7 @@ import { RestApi } from '../../utils/RestApi';
 import StatItem from '../StatItem/StatItem';
 
 const ComparePage = ({ history, match }) => {
-	const { dispatch, covidDataProperFormat, selectedCountriesToCompare } = useStoreon('covidDataProperFormat', 'selectedCountriesToCompare');
+	const { dispatch, covidDataProperFormat, selectedCountriesToCompare, covidDataVariables } = useStoreon('covidDataProperFormat', 'selectedCountriesToCompare', 'covidDataVariables');
 
 	const fetchData = useCallback(async () => {
 		dispatch('covidData/get', await RestApi.get('https://pomber.github.io/covid19/timeseries.json'));
@@ -21,12 +21,12 @@ const ComparePage = ({ history, match }) => {
 		} else {
 			covidDataProperFormat && covidDataProperFormat.forEach(item => {
 				if (countryParamsArray.includes(item.country.toLowerCase())) {
-					// updatedData.filter(country => country[0].toLocaleLowerCase() === searchValue);
 					countriesToCompare.push(item);
 				}
 			})
 			if (countriesToCompare.length < 4 && countriesToCompare.length > 1) {
 				dispatch('setSelectedCountries', countriesToCompare)
+				dispatch('getDataVariables', countriesToCompare);
 			} else {
 				history.push('/');
 			}
@@ -38,7 +38,7 @@ const ComparePage = ({ history, match }) => {
 		const countryParams = match.params.countriesToCompare.split("+").join(",").replace(/-/g, ' ');
 		const countryParamsArray = countryParams.split(',');
 		getSelectedCountries(countryParamsArray);
-	  }, [getSelectedCountries, match.params.countriesToCompare, covidDataProperFormat]);
+	}, [getSelectedCountries, match.params.countriesToCompare, covidDataProperFormat]);
 
 	  const arrayToObject = (array, keyField) =>
 		array.reduce((obj, item) => {
@@ -76,67 +76,29 @@ const ComparePage = ({ history, match }) => {
 			<p className="c--fluctuation-label">* Daily fluctuation</p>
 			<div className={`stat-items-container ${selectedCountriesToCompare?.length === 2 ? 'stat-items-container-mobile-2' : 'stat-items-container-mobile-3'}`}
 			>
-				{selectedCountriesToCompare && selectedCountriesToCompare.length
-					? selectedCountriesToCompare.map((item, i) => {
-						const latestData = item && item.data[item && item.data.length - 1];
-						const yesterdaysData = item && item.data[item.data.length - 2];
-						const dayBeforeYesterdaysData = item && item.data[item.data.length - 3];
-						const confirmedCases = latestData?.confirmed;
-						const deaths = latestData?.deaths;
-						const recovered = latestData?.recovered;
-						const yesterdaysConfirmedCases = yesterdaysData?.confirmed;
-						const yesterdaysDeaths = yesterdaysData?.deaths;
-						const yesterdaysRecovered = yesterdaysData?.recovered;
-						const dayBeforeYesterdaysConfirmedCases = dayBeforeYesterdaysData?.confirmed;
-						const dayBeforeYesterdaysDeaths = dayBeforeYesterdaysData?.deaths;
-						const dayBeforeYesterdaysRecovered = dayBeforeYesterdaysData?.recovered;
-
+				{selectedCountriesToCompare && selectedCountriesToCompare.length && covidDataVariables && covidDataVariables.length
+					? covidDataVariables.map((item, i) => {
 						
-						const confirmedCaseDifferential = confirmedCases && yesterdaysConfirmedCases && Math.round(Number(confirmedCases) - Number(yesterdaysConfirmedCases));
-						const deathDifferential = deaths && yesterdaysDeaths && Math.round(Number(deaths) - Number(yesterdaysDeaths));
-						const recoveredDifferential = recovered && yesterdaysRecovered && Math.round(Number(recovered) - Number(yesterdaysRecovered));
-
-						const yesterdayconfirmedCaseDifferential = yesterdaysConfirmedCases && dayBeforeYesterdaysConfirmedCases && Math.round(Number(yesterdaysConfirmedCases) - Number(dayBeforeYesterdaysConfirmedCases));
-						const yesterdaydeathDifferential = yesterdaysDeaths && dayBeforeYesterdaysDeaths && Math.round(Number(yesterdaysDeaths) - Number(dayBeforeYesterdaysDeaths));
-						const yesterdayrecoveredDifferential = yesterdaysRecovered && dayBeforeYesterdaysRecovered && Math.round(Number(yesterdaysRecovered) - Number(dayBeforeYesterdaysRecovered));
-
-						const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential !== 0 ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
-						const finalConfirmedFluctuation = typeof confirmedCaseFluctuation !== 'string' && confirmedCaseFluctuation < 100
-							? `-${100 - confirmedCaseFluctuation}`
-							: yesterdayconfirmedCaseDifferential === 0 ? `+${confirmedCaseDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-							: `+${confirmedCaseFluctuation - 100}`;
-							
-						const deathFluctuation = deathDifferential && yesterdaydeathDifferential !== 0 ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
-						const finalDeathFluctuation = typeof deathFluctuation !== 'string' && deathFluctuation < 100
-							? `-${100 - deathFluctuation}`
-							: yesterdaydeathDifferential === 0 && deathFluctuation > 100 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-							: `+${deathFluctuation - 100}`;
-							
-						const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential !== 0 ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
-						const finalRecoveredFluctuation = typeof recoveredFluctuation !== 'string' && recoveredFluctuation < 100
-							? `-${100 - recoveredFluctuation}`
-							: yesterdayrecoveredDifferential === 0 ? `+${recoveredDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-							: `+${recoveredFluctuation - 100}`;
 						return (
 							<div className={`c--compare-column c--compare-column-${i}`} key={i}>
 								<p className="c--country-name-label">{item.country}</p>
 								<StatItem
-									statNumber={confirmedCases}
+									statNumber={item?.confirmedCases}
 									label={'Confirmed cases'}
-									fluctuation={finalConfirmedFluctuation}
-									countIncrease={confirmedCaseDifferential}
+									fluctuation={item?.finalConfirmedFluctuation}
+									countIncrease={item?.confirmedCaseDifferential}
 								/>
 								<StatItem
-									statNumber={deaths}
+									statNumber={item?.deaths}
 									label={'Deaths'}
-									fluctuation={finalDeathFluctuation}
-									countIncrease={deathDifferential}
+									fluctuation={item?.finalDeathFluctuation}
+									countIncrease={item?.deathDifferential}
 								/>
 								<StatItem
-									statNumber={recovered}
+									statNumber={item?.recovered}
 									label={'Recovered'}
-									fluctuation={finalRecoveredFluctuation}
-									countIncrease={recoveredDifferential}
+									fluctuation={item?.finalRecoveredFluctuation}
+									countIncrease={item?.recoveredDifferential}
 								/>
 							</div>
 						)

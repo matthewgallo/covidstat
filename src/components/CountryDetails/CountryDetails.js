@@ -12,10 +12,9 @@ import { Dropdown } from 'carbon-components-react';
 import { chunk } from '../../utils/chunk';
 
 const CountryDetails = props => {
-	const { dispatch, covidDataProperFormat, currentSelectedCountry } = useStoreon('covidDataProperFormat', 'currentSelectedCountry');
+	const { dispatch, covidDataProperFormat, currentSelectedCountry, covidDataVariables } = useStoreon('covidDataProperFormat', 'currentSelectedCountry', 'covidDataVariables');
 	const [finalHeatmapData, setFinalHeatmapData] = useState([]);
 	const [heatmapType, setHeatmapType] = useState('confirmed');
-
 	
 	const fetchData = useCallback(async () => {
 		dispatch('covidData/get', await RestApi.get('https://pomber.github.io/covid19/timeseries.json'));
@@ -35,7 +34,6 @@ const CountryDetails = props => {
 		}
 	}, [currentSelectedCountry, covidDataProperFormat, fetchData, dispatch, props.match.params.countryFriendlyName, props.history]);
 
-
 	useEffect(() => {
 		// code to run on component mount
 		if (currentSelectedCountry) {
@@ -49,6 +47,7 @@ const CountryDetails = props => {
 				})
 			});
 			setFinalHeatmapData(finalHeatmapData);
+			dispatch('getDataVariables', currentSelectedCountry);
 		} else {
 			findCurrentSelectedCountry();
 		}
@@ -73,47 +72,6 @@ const CountryDetails = props => {
 			return updatedCountryData;
 	}
 
-	const countryData = currentSelectedCountry && currentSelectedCountry[0];
-	const latestData = countryData && countryData.data[countryData && countryData.data.length - 1];
-	const yesterdaysData = countryData && countryData.data[countryData.data.length - 2];
-	const dayBeforeYesterdaysData = countryData && countryData.data[countryData.data.length - 3];
-	const latestDate = latestData?.date;
-	const confirmedCases = latestData?.confirmed;
-	const deaths = latestData?.deaths;
-	const recovered = latestData?.recovered;
-	const yesterdaysConfirmedCases = yesterdaysData?.confirmed;
-	const yesterdaysDeaths = yesterdaysData?.deaths;
-	const yesterdaysRecovered = yesterdaysData?.recovered;
-	const dayBeforeYesterdaysConfirmedCases = dayBeforeYesterdaysData?.confirmed;
-	const dayBeforeYesterdaysDeaths = dayBeforeYesterdaysData?.deaths;
-	const dayBeforeYesterdaysRecovered = dayBeforeYesterdaysData?.recovered;
-
-	
-	const confirmedCaseDifferential = confirmedCases && yesterdaysConfirmedCases && Math.round(Number(confirmedCases) - Number(yesterdaysConfirmedCases));
-	const deathDifferential = deaths && yesterdaysDeaths && Math.round(Number(deaths) - Number(yesterdaysDeaths));
-	const recoveredDifferential = recovered && yesterdaysRecovered && Math.round(Number(recovered) - Number(yesterdaysRecovered));
-
-	const yesterdayconfirmedCaseDifferential = yesterdaysConfirmedCases && dayBeforeYesterdaysConfirmedCases && Math.round(Number(yesterdaysConfirmedCases) - Number(dayBeforeYesterdaysConfirmedCases));
-	const yesterdaydeathDifferential = yesterdaysDeaths && dayBeforeYesterdaysDeaths && Math.round(Number(yesterdaysDeaths) - Number(dayBeforeYesterdaysDeaths));
-	const yesterdayrecoveredDifferential = yesterdaysRecovered && dayBeforeYesterdaysRecovered && Math.round(Number(yesterdaysRecovered) - Number(dayBeforeYesterdaysRecovered));
-
-	const confirmedCaseFluctuation = confirmedCaseDifferential && yesterdayconfirmedCaseDifferential !== 0 ? Math.round((confirmedCaseDifferential * 100) / yesterdayconfirmedCaseDifferential) : '';
-	const finalConfirmedFluctuation = typeof confirmedCaseFluctuation !== 'string' && confirmedCaseFluctuation < 100
-		? `-${100 - confirmedCaseFluctuation}`
-		: yesterdayconfirmedCaseDifferential === 0 ? `+${confirmedCaseDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-		: `+${confirmedCaseFluctuation - 100}`;
-		
-	const deathFluctuation = deathDifferential && yesterdaydeathDifferential !== 0 ? Math.round((deathDifferential * 100) / yesterdaydeathDifferential) : '';
-	const finalDeathFluctuation = typeof deathFluctuation !== 'string' && deathFluctuation < 100
-		? `-${100 - deathFluctuation}`
-		: yesterdaydeathDifferential === 0 && deathFluctuation > 100 ? `+${deathDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-		: `+${deathFluctuation - 100}`;
-		
-	const recoveredFluctuation = recoveredDifferential && yesterdayrecoveredDifferential !== 0 ? Math.round((recoveredDifferential * 100) / yesterdayrecoveredDifferential) : '';
-	const finalRecoveredFluctuation = typeof recoveredFluctuation !== 'string' && recoveredFluctuation < 100
-		? `-${100 - recoveredFluctuation}`
-		: yesterdayrecoveredDifferential === 0 ? `+${recoveredDifferential}` // the previous day was 0, since we can't divide a number by 0 then the fluctuation percentage is the current days differential number
-		: `+${recoveredFluctuation - 100}`;
 
 	const downloadCountryJSON = (event, currentCountry) => {
 		event.preventDefault();
@@ -166,31 +124,31 @@ const CountryDetails = props => {
 	return (
 		<PageWrapper>
 			<h1>{currentSelectedCountry ? currentSelectedCountry[0].country : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}</h1>
-			{latestData ? <p className="c--last-updated">Last updated {latestDate}</p> : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}
+			{covidDataVariables ? <p className="c--last-updated">Last updated {covidDataVariables?.latestDate}</p> : <SkeletonText style={{ width: '6rem', height: '1.25rem' }} />}
 			<p className="c--fluctuation-label">&#176; Daily count</p>
 			<p className="c--fluctuation-label">* Daily fluctuation</p>
 			<div className="c--main-content-container">
 
 				<div className="stat-items-container">
 					<StatItem
-						statNumber={confirmedCases}
+						statNumber={covidDataVariables?.confirmedCases}
 						label={'Confirmed cases'}
-						fluctuation={finalConfirmedFluctuation}
-						countIncrease={confirmedCaseDifferential}
+						fluctuation={covidDataVariables?.finalConfirmedFluctuation}
+						countIncrease={covidDataVariables?.confirmedCaseDifferential}
 						activeStatItem={heatmapType === 'confirmed' ? true : false}
 						/>
 					<StatItem
-						statNumber={deaths}
+						statNumber={covidDataVariables?.deaths}
 						label={'Deaths'}
-						fluctuation={finalDeathFluctuation}
-						countIncrease={deathDifferential}
+						fluctuation={covidDataVariables?.finalDeathFluctuation}
+						countIncrease={covidDataVariables?.deathDifferential}
 						activeStatItem={heatmapType === 'deaths' ? true : false}
 						/>
 					<StatItem
-						statNumber={recovered}
+						statNumber={covidDataVariables?.recovered}
 						label={'Recovered'}
-						fluctuation={finalRecoveredFluctuation}
-						countIncrease={recoveredDifferential}
+						fluctuation={covidDataVariables?.finalRecoveredFluctuation}
+						countIncrease={covidDataVariables?.recoveredDifferential}
 						activeStatItem={heatmapType === 'recovered' ? true : false}
 					/>
 				</div>
