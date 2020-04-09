@@ -28,6 +28,9 @@
     "react-scripts": "3.4.1",
     "storeon": "^2.0.2"
   },
+  "resolutions": {
+    "minimist": "^1.2.5"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -35,7 +38,8 @@
     "eject": "react-scripts eject",
     "deploy": "now && now --target production",
     "now-dev": "react-scripts start",
-    "now-build": "react-scripts build"
+    "now-build": "react-scripts build",
+    "preinstall": "npx npm-force-resolutions"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -51,5 +55,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "minimist": "^1.2.5"
   }
 }
