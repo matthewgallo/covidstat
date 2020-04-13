@@ -12,7 +12,6 @@ function App(props) {
   const { dispatch, covidDataProperFormat, searchResults, selectedCountriesToCompare } = useStoreon('covidDataProperFormat', 'searchResults', 'selectedCountriesToCompare');
   const [multiSelectInvalid, setMultiSelectInvalid] = useState(false);
   const [activeView, setActiveView] = useState('search');
-  
 
   useEffect(() => {
     const fetchData = async () => {

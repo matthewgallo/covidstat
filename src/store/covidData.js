@@ -5,6 +5,19 @@ export function covidData (store) {
 	// 	searchResults: [],
 	// 	selectedCountriesToCompare: []
 	// }))
+
+	store.on('updateState', (state = {}, data) => {
+		let newState = {
+			...state,
+		};
+		if (data && data.scope && data.data) {
+			newState[data.scope] = {
+				...newState[data.scope],
+				...data.data,
+			};
+		}
+		return newState;
+	})
   
 	store.on('covidData/get', ({ covidDataProperFormat }, data) => {
 		data['United States'] = data['US'];
